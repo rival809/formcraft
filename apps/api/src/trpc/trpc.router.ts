@@ -1,5 +1,4 @@
 import { Injectable, type OnModuleInit } from '@nestjs/common'
-import type { AnyRouter } from '@trpc/server'
 import { TrpcService } from './trpc.service.js'
 import { FormsService } from '../forms/forms.service.js'
 import { ResponsesService } from '../responses/responses.service.js'
@@ -22,7 +21,8 @@ export class TrpcRouter implements OnModuleInit {
     private readonly storage: StorageService,
   ) {}
 
-  appRouter!: AnyRouter
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  appRouter!: any
 
   onModuleInit() {
     this.appRouter = this.trpc.router({
