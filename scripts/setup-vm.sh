@@ -12,29 +12,53 @@ set -euo pipefail
 echo "==> [1/6] Update system packages..."
 apt-get update -qq && apt-get upgrade -y -qq
 
-echo "==> [2/6] Install Docker Engine..."
-apt-get install -y -qq ca-certificates curl gnupg lsb-release
+echo "==> [2/6] Cek Docker..."
+if command -v docker &>/dev/null; then
+  echo "  Docker sudah terinstall: $(docker --version)"
 
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
-  | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-chmod a+r /etc/apt/keyrings/docker.gpg
+  # Pastikan docker compose plugin tersedia
+  if ! docker compose version &>/dev/null; then
+    echo "  Docker Compose plugin belum ada, install..."
+    apt-get install -y -qq docker-compose-plugin
+  else
+    echo "  Docker Compose sudah ada: $(docker compose version)"
+  fi
 
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
-  https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
-  > /etc/apt/sources.list.d/docker.list
+  # Pastikan service jalan
+  systemctl enable docker --quiet
+  systemctl start docker
 
-apt-get update -qq
-apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  # Pastikan user ada di grup docker
+  usermod -aG docker "${SUDO_USER:-$USER}" || true
+else
+  echo "  Docker belum ada, install..."
+  apt-get install -y -qq ca-certificates curl gnupg lsb-release
 
-systemctl enable docker
-systemctl start docker
+  install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+    | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  chmod a+r /etc/apt/keyrings/docker.gpg
 
-# Allow current user to run docker without sudo
-usermod -aG docker "${SUDO_USER:-$USER}" || true
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+    https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
+    > /etc/apt/sources.list.d/docker.list
 
-echo "==> [3/6] Install git..."
-apt-get install -y -qq git
+  apt-get update -qq
+  apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+  systemctl enable docker
+  systemctl start docker
+  usermod -aG docker "${SUDO_USER:-$USER}" || true
+  echo "  Docker terinstall: $(docker --version)"
+fi
+
+echo "==> [3/6] Cek git..."
+if command -v git &>/dev/null; then
+  echo "  Git sudah ada: $(git --version)"
+else
+  echo "  Install git..."
+  apt-get install -y -qq git
+fi
 
 echo "==> [4/6] Create swap file (4GB) — penting untuk build Next.js..."
 if [ ! -f /swapfile ]; then
