@@ -5,6 +5,8 @@
     "module": "CommonJS",
     "moduleResolution": "Node",
     "verbatimModuleSyntax": false,
+    "declaration": false,
+    "declarationMap": false,
     "target": "ES2022",
     "lib": ["ES2022"],
     "experimentalDecorators": true,
