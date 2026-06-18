@@ -2,12 +2,12 @@
 FROM node:20-alpine AS deps
 RUN corepack enable pnpm
 WORKDIR /app
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY package.json pnpm-workspace.yaml ./
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/types/package.json ./packages/types/
 COPY packages/config/package.json ./packages/config/
 COPY apps/web/package.json ./apps/web/
-RUN pnpm install --frozen-lockfile --filter @formcraft/web...
+RUN pnpm install --no-frozen-lockfile --filter @formcraft/web...
 
 # ─── Stage 2: build ───────────────────────────────────────────────────────────
 FROM deps AS builder
