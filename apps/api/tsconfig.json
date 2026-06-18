@@ -1,0 +1,11 @@
+{
+  "extends": "@formcraft/config/typescript/nestjs",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*"]
+}

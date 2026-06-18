@@ -1,0 +1,60 @@
+# Production overrides — dipakai bersama docker-compose.yml:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Perubahan utama vs base:
+#   - Port DB/Redis/MinIO TIDAK diexpose ke host (hanya via internal Docker network)
+#   - Resource limits per service
+#   - restart: always (bukan unless-stopped)
+#   - MailHog profile dihapus (tidak perlu di prod)
+
+services:
+  postgres:
+    restart: always
+    ports: !reset []          # tutup port 5432 dari public
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  redis:
+    restart: always
+    ports: !reset []          # tutup port 6379 dari public
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+
+  minio:
+    restart: always
+    ports:
+      - "9000:9000"           # tetap expose untuk presigned URL dari browser
+      - "9001:9001"           # MinIO Console (opsional, bisa ditutup setelah setup)
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  api:
+    restart: always
+    ports: !reset []          # tutup port 4000 dari public — hanya via nginx
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512m
+
+  web:
+    restart: always
+    ports: !reset []          # tutup port 3000 dari public — hanya via nginx
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512m
+
+  nginx:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 128m

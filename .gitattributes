@@ -1,0 +1,11 @@
+# Force LF line endings for all files (penting agar script .sh bisa dijalankan di Linux VM)
+* text=auto eol=lf
+
+# Binary files — jangan diubah
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
