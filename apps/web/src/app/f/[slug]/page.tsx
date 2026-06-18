@@ -6,9 +6,7 @@ interface Props {
   params: Promise<{ slug: string }>
 }
 
-// Next.js 16 "use cache" — cache the public form definition for 60s
 async function getForm(slug: string) {
-  'use cache'
   const res = await fetch(`${process.env.API_URL}/api/trpc/form.bySlug?input=${encodeURIComponent(JSON.stringify({ slug }))}`, {
     next: { revalidate: 60 },
   })

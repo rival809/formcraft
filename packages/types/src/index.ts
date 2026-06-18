@@ -1,3 +1,3 @@
-export * from './form.schema.js'
-export * from './response.schema.js'
-export * from './webhook.schema.js'
+export * from './form.schema'
+export * from './response.schema'
+export * from './webhook.schema'
