@@ -3,7 +3,8 @@
   "extends": "./base.json",
   "compilerOptions": {
     "module": "CommonJS",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
+    "verbatimModuleSyntax": false,
     "target": "ES2022",
     "lib": ["ES2022"],
     "experimentalDecorators": true,

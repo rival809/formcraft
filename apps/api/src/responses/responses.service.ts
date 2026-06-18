@@ -109,7 +109,7 @@ export class ResponsesService {
     const fields = (form.fields as Array<{ id: string; label: string }>) ?? []
     const headers = ['submittedAt', ...fields.map((f) => f.label)]
 
-    const rows = responses.map((r) => {
+    const rows = responses.map((r: { data: unknown; createdAt: Date }) => {
       const data = r.data as Record<string, unknown>
       return [
         r.createdAt.toISOString(),

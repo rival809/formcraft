@@ -21,7 +21,10 @@ export class TrpcRouter implements OnModuleInit {
     private readonly storage: StorageService,
   ) {}
 
-  appRouter = this.trpc.router({
+  appRouter!: ReturnType<typeof this.trpc.router>
+
+  onModuleInit() {
+    this.appRouter = this.trpc.router({
     // ─── Workspace ────────────────────────────────────────────────────────────
     workspace: this.trpc.router({
       list: this.trpc.protectedProcedure.query(({ ctx }) =>
@@ -139,10 +142,7 @@ export class TrpcRouter implements OnModuleInit {
           return { uploadUrl: url, key, publicUrl }
         }),
     }),
-  })
-
-  onModuleInit() {
-    // Router initialised
+    })
   }
 }
 
