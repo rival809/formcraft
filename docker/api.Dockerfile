@@ -16,6 +16,7 @@ COPY packages/ ./packages/
 COPY apps/api/ ./apps/api/
 RUN pnpm --filter @formcraft/db db:generate
 RUN pnpm --filter @formcraft/db build
+RUN pnpm --filter @formcraft/types build
 RUN pnpm --filter @formcraft/api build
 
 ENV NODE_ENV=production
