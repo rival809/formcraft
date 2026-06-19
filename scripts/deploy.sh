@@ -42,11 +42,11 @@ until docker compose exec -T postgres pg_isready -U formcraft -d formcraft_db; d
 done
 
 echo "==> [6] Jalankan database migrations..."
-docker compose exec -T api node -e "
-const { execSync } = require('child_process');
-execSync('npx prisma migrate deploy', { stdio: 'inherit', cwd: '/app' });
-" 2>/dev/null || \
-docker compose run --rm api sh -c "cd /app && npx prisma migrate deploy" || \
+docker compose exec -T api sh -c \
+  "cd /app && npx prisma migrate deploy --schema packages/db/prisma/schema.prisma" || \
+docker compose run --rm \
+  -e DATABASE_URL="$DATABASE_URL" \
+  api sh -c "cd /app && npx prisma migrate deploy --schema packages/db/prisma/schema.prisma" || \
 echo "  (Skip migration — jalankan manual jika perlu)"
 
 echo "==> [7] Setup MinIO bucket (jika belum ada)..."
