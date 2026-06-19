@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@formcraft/ui'
 import { signIn } from '@/lib/auth/client'
 
@@ -16,6 +16,7 @@ type FormValues = z.infer<typeof schema>
 
 export function LoginForm() {
   const router = useRouter()
+  const params = useSearchParams()
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
   })
@@ -23,7 +24,7 @@ export function LoginForm() {
   const onSubmit = async (values: FormValues) => {
     const res = await signIn.email({ email: values.email, password: values.password })
     if (res.error) return alert(res.error.message)
-    router.push('/dashboard')
+    router.push(params.get('callbackUrl') ?? '/dashboard')
   }
 
   return (
