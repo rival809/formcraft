@@ -4,13 +4,72 @@ import { useState } from 'react'
 import { trpc } from '@/lib/trpc/client'
 import { useWorkspaceStore } from '@/lib/store/workspace.store'
 import { Button } from '@formcraft/ui'
-import { Key, Copy, Check, Trash2, Plus } from 'lucide-react'
+import { Key, Copy, Check, Trash2, Plus, Building2 } from 'lucide-react'
 
 export function WorkspaceSettings() {
-  const { currentWorkspaceId } = useWorkspaceStore()
+  const { currentWorkspaceId, setCurrentWorkspace } = useWorkspaceStore()
+  const utils = trpc.useUtils()
+
+  const [name, setName] = useState('')
+  const [slug, setSlug] = useState('')
+
+  const create = trpc.workspace.create.useMutation({
+    onSuccess: (ws) => {
+      utils.workspace.list.invalidate()
+      setCurrentWorkspace(ws.id)
+      setName('')
+      setSlug('')
+    },
+  })
 
   if (!currentWorkspaceId) {
-    return <p className="text-sm text-muted-foreground">No workspace selected.</p>
+    return (
+      <div className="space-y-6 max-w-md">
+        <div className="rounded-lg border border-dashed p-8 text-center space-y-2">
+          <Building2 className="h-8 w-8 mx-auto text-muted-foreground" />
+          <p className="font-medium">No workspace yet</p>
+          <p className="text-sm text-muted-foreground">Create a workspace to start building forms.</p>
+        </div>
+
+        <div className="space-y-4">
+          <h2 className="text-base font-semibold">Create Workspace</h2>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Name</label>
+              <input
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value)
+                  setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''))
+                }}
+                placeholder="My Workspace"
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Slug</label>
+              <input
+                value={slug}
+                onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, ''))}
+                placeholder="my-workspace"
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm font-mono"
+              />
+              <p className="text-xs text-muted-foreground">Lowercase letters, numbers, and hyphens only.</p>
+            </div>
+            <Button
+              disabled={!name || !slug || create.isPending}
+              onClick={() => create.mutate({ name, slug })}
+              className="w-full"
+            >
+              {create.isPending ? 'Creating...' : 'Create Workspace'}
+            </Button>
+            {create.isError && (
+              <p className="text-sm text-destructive">{create.error.message}</p>
+            )}
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -55,7 +114,6 @@ function ApiKeyManager({ workspaceId }: { workspaceId: string }) {
         </p>
       </div>
 
-      {/* Revealed key banner */}
       {revealedKey && (
         <div className="rounded-lg border border-green-500/40 bg-green-500/10 p-4 space-y-2">
           <p className="text-sm font-medium text-green-700">
@@ -73,7 +131,6 @@ function ApiKeyManager({ workspaceId }: { workspaceId: string }) {
         </div>
       )}
 
-      {/* Create form */}
       <div className="flex gap-2">
         <input
           value={newKeyName}
@@ -92,7 +149,6 @@ function ApiKeyManager({ workspaceId }: { workspaceId: string }) {
         </Button>
       </div>
 
-      {/* Keys list */}
       {isLoading && <p className="text-xs text-muted-foreground">Loading keys...</p>}
       <div className="space-y-2">
         {keys?.length === 0 && <p className="text-xs text-muted-foreground">No API keys yet.</p>}
@@ -117,7 +173,6 @@ function ApiKeyManager({ workspaceId }: { workspaceId: string }) {
         ))}
       </div>
 
-      {/* Usage example */}
       {keys && keys.length > 0 && (
         <div className="rounded-lg border bg-muted/30 p-4 space-y-2">
           <p className="text-xs font-medium text-muted-foreground">Usage example</p>
