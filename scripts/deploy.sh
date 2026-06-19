@@ -44,10 +44,7 @@ done
 echo "==> [6] Jalankan database migrations..."
 docker compose exec -T api sh -c \
   "cd /app && npx prisma migrate deploy --schema packages/db/prisma/schema.prisma" || \
-docker compose run --rm \
-  -e DATABASE_URL="$DATABASE_URL" \
-  api sh -c "cd /app && npx prisma migrate deploy --schema packages/db/prisma/schema.prisma" || \
-echo "  (Skip migration — jalankan manual jika perlu)"
+echo "  (Skip migration — jalankan manual: docker compose exec api sh -c 'cd /app && npx prisma migrate deploy --schema packages/db/prisma/schema.prisma')"
 
 echo "==> [7] Setup MinIO bucket (jika belum ada)..."
 sleep 3
