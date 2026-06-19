@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { initTRPC, TRPCError } from '@trpc/server'
+import superjson from 'superjson'
 import type { Context } from './trpc.context.js'
 
-const t = initTRPC.context<Context>().create()
+const t = initTRPC.context<Context>().create({ transformer: superjson })
 
 // Module-level so the return types can be inferred without portability issues
 const router = t.router
