@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -14,7 +15,7 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>
 
-export function LoginForm() {
+function LoginFormInner() {
   const router = useRouter()
   const params = useSearchParams()
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
@@ -51,5 +52,13 @@ export function LoginForm() {
         {isSubmitting ? 'Signing in...' : 'Sign in'}
       </Button>
     </form>
+  )
+}
+
+export function LoginForm() {
+  return (
+    <Suspense fallback={<div className="space-y-4 animate-pulse"><div className="h-9 rounded-md bg-muted" /><div className="h-9 rounded-md bg-muted" /><div className="h-9 rounded-md bg-muted" /></div>}>
+      <LoginFormInner />
+    </Suspense>
   )
 }
