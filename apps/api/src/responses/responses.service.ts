@@ -34,7 +34,7 @@ export class ResponsesService {
       },
     })
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+    const appUrl = process.env.BETTER_AUTH_URL ?? 'http://localhost:3000'
 
     // Webhook deliveries (async via BullMQ)
     for (const webhook of form.webhooks) {
@@ -62,7 +62,7 @@ export class ResponsesService {
         await this.mail.sendNewResponseNotification({
           ownerEmail: member.user.email,
           formTitle: form.title,
-          responseId: form.id,
+          responseId: response.id,
           appUrl,
         })
       }

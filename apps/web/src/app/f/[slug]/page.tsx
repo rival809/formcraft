@@ -1,18 +1,25 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import superjson from 'superjson'
 import { FormRenderer } from '@/components/form-renderer/form-renderer'
+
+export const dynamic = 'force-dynamic'
 
 interface Props {
   params: Promise<{ slug: string }>
 }
 
 async function getForm(slug: string) {
-  const res = await fetch(`${process.env.API_URL}/api/trpc/form.bySlug?input=${encodeURIComponent(JSON.stringify({ slug }))}`, {
-    next: { revalidate: 60 },
-  })
-  if (!res.ok) return null
-  const json = await res.json()
-  return json?.result?.data ?? null
+  const apiUrl = process.env.API_URL ?? 'http://api:4000'
+  try {
+    const res = await fetch(`${apiUrl}/api/trpc/form.bySlug?input=${encodeURIComponent(JSON.stringify({ slug }))}`)
+    if (!res.ok) return null
+    const json = await res.json()
+    if (!json?.result?.data) return null
+    return superjson.deserialize(json.result.data)
+  } catch {
+    return null
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
